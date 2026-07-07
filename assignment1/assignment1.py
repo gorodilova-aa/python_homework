@@ -44,12 +44,12 @@ def calc(val1, val2, operation="multiply"):
             return "You can't integer divide those values!"
         except ZeroDivisionError:
             return "You can't divide by 0!"
-    elif operation == "exponent":
+    elif operation == "power":
         try:
             return val1 ** val2
         except TypeError:
-            return "You can't exponent those values!"
-        
+            return "You can't power those values!"
+
 # ---- Task 4 ----
 
 def data_type_conversion(value, new_type):
