@@ -1,6 +1,7 @@
 # ---- Task 2 ----
 
 import csv
+import traceback
 
 def read_employees():
     dict = { "fields": [], "rows": [] }
@@ -8,15 +9,26 @@ def read_employees():
     try:
         with open("../csv/employees.csv", "r") as file:
             reader = csv.reader(file)
-            first_row = next(reader) # store first row as headers and goes to the next row
-            dict["fields"] = first_row
-
-            for row in reader: # reading the data rows
-                dict["rows"].append(row)
+            flag = True  # indicates first row
+         
+            for row in reader: 
+                if flag:
+                    dict["fields"] = row
+                    flag = False
+                else:
+                    dict["rows"].append(row)
 
     except Exception as e:
-        print(f"An error occurred reading the file: {e}")
-        return None
+        trace_back = traceback.extract_tb(e.__traceback__)
+        stack_trace = list()
+        for trace in trace_back:
+            stack_trace.append(f'File : {trace[0]} , Line : {trace[1]}, Func.Name : {trace[2]}, Message : {trace[3]}')
+        print(f"An exception occurred. {type(e).__name__}")
+        message = str(e)
+        if message:
+            print(f"Exception message: {message}")
+        print(f"Stack trace: {stack_trace}")
+        
     return dict
 
 employees = read_employees()
