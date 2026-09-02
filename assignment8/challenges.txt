@@ -1,0 +1,7 @@
+Challenge 1: 
+Web scraping and automating browser interactions with Selenium and WebDriver Manager were completely new concepts to me.
+Resolution: Reviewed the lesson materials thoroughly and consulted official documentation to understand the DOM and dynamic page rendering.
+
+Challenge 2: 
+Writing reliable selectors was difficult due to dynamic page layouts, shifting class names, and pages where target lists were nested or relocated.
+Resolution: Used Chrome DevTools to inspect HTML hierarchies and tested specific CSS classes and XPath axes directly in the Elements search bar.

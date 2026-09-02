@@ -1,0 +1,21 @@
+# ------- Task 5: Ethical Web Scraping -------
+
+Which sections of the website are restricted for crawling?
+
+Wikipedia restricts access to core system and dynamic paths such as /w/, /api/, and /trap/, 
+as well as special administrative pages like /wiki/Special: (including localized versions across languages) 
+and search-related query pages. 
+These areas are disallowed to prevent automated crawlers from triggering resource-heavy backend operations.
+
+Are there specific rules for certain user agents?
+
+Yes, the file contains tailored directives for various user agents. 
+Several aggressive or undesirable crawlers (such as MJ12bot, wget, fast, TeleportPro, HTTrack, and more others) are entirely blocked with Disallow: /. 
+Others have specific constraints, such as SemrushBot, which is assigned a Crawl-delay: 5 directive to throttle its request rate.
+
+Purpose of robots.txt and how it promotes ethical scraping
+
+Websites use robots.txt as a standardized communication standard to instruct web crawlers on which areas of the site can or cannot be accessed. 
+Its main purpose is to safeguard server performance by preventing automated traffic from overloading databases or running costly dynamic scripts. 
+By adhering to these directives, scrapers practice ethical data collection that respects site policies, maintains server stability, 
+and avoids service disruption for human users.
