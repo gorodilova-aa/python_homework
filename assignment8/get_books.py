@@ -32,38 +32,31 @@ try:
 
     for item in book_items:
         # title 
-        try:
-            title_elem = item.find_element(By.CSS_SELECTOR, 'span.title-content, [data-key="item-title"]')
-            title = title_elem.text.strip()
-        except Exception:
-            title = ""
-
+        title_elem = item.find_element(By.CSS_SELECTOR, 'span.title-content')
+        title = title_elem.text.strip() if title_elem else ""
+        
         # authors 
-        try:
-            author_elems = item.find_elements(By.CSS_SELECTOR, 'a.author-link, a[class*="author"]')
-            authors = "; ".join([a.text.strip() for a in author_elems if a.text.strip()])
-        except Exception:
-            authors = ""
-
+        
+        author_elems = item.find_elements(By.CSS_SELECTOR, 'a.author-link')
+        authors = "; ".join([a.text.strip() for a in author_elems if a.text.strip()])
+        
         # format and year
-        try:
-            format_year_elem = item.find_element(By.CSS_SELECTOR, 'span.manifestation-item-format-info, div[class*="format"]')
-            format_year = format_year_elem.text.strip()
-        except Exception:
-            format_year = ""
+        format_year_div = item.find_element(By.CSS_SELECTOR, 'div.cp-format-info')
+    
+        format_year_span = format_year_div.find_element(By.CSS_SELECTOR, 'span')
+        format_year = format_year_span.text.strip()
 
-        if title:
-            results.append({
-                "Title": title,
-                "Author": authors,
-                "Format-Year": format_year
-            })
+        results.append({
+            "Title": title,
+            "Author": authors,
+            "Format-Year": format_year
+        })
 
-    # Task 3: Print DataFrame to console
+    # create and print DataFrame
     df = pd.DataFrame(results)
     print(df)
 
-    # Task 4: Save data to CSV and JSON
+ # ------- Task 4: Write out the Data -------
     df.to_csv("get_books.csv", index=False)
     
     with open("get_books.json", "w", encoding="utf-8") as f:
