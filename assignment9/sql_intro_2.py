@@ -1,5 +1,4 @@
 import sqlite3
-from numpy import rint
 import pandas as pd
 
 # Task 2: Read data from lesson.db to a DataFrame
