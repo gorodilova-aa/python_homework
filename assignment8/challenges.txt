@@ -5,3 +5,9 @@ Resolution: Reviewed the lesson materials thoroughly and consulted official docu
 Challenge 2: 
 Writing reliable selectors was difficult due to dynamic page layouts, shifting class names, and pages where target lists were nested or relocated.
 Resolution: Used Chrome DevTools to inspect HTML hierarchies and tested specific CSS classes and XPath axes directly in the Elements search bar.
+
+Challenge 3:
+The initial URL https://owasp.org/www-project-top-ten/ serves as a project portal and does not list the individual vulnerability items directly on the landing page. 
+Resolution: To comply with the required starting URL while accurately scraping the items, the script navigates to https://owasp.org/www-project-top-ten/, 
+extracts the link to the active Top 10 release using XPath, navigates to that subpage, 
+and then extracts the 10 vulnerabilities using //li/a[starts-with(normalize-space(.), 'A0') or starts-with(normalize-space(.), 'A10')].
