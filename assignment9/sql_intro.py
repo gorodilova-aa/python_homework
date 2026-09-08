@@ -10,64 +10,79 @@ def add_publisher(cursor, name):
         cursor.execute("INSERT INTO publishers (name) VALUES (?)", (name,))
     except sqlite3.IntegrityError:
         print(f"Publisher '{name}' already exists.")
-
+    except sqlite3.Error as e:
+        print(f"Database error while adding publisher '{name}': {e}")
 
 # Function to add a magazine
 def add_magazine(cursor, name, publisher_name):
-    cursor.execute("SELECT publisher_id FROM publishers WHERE name = ?", (publisher_name,))
-    row = cursor.fetchone()
-    if not row:
-        print(f"Publisher '{publisher_name}' not found. Cannot add magazine '{name}'.")
-        return
-    publisher_id = row[0]
-    
     try:
+        cursor.execute("SELECT publisher_id FROM publishers WHERE name = ?", (publisher_name,))
+        row = cursor.fetchone()
+        if not row:
+            print(f"Publisher '{publisher_name}' not found. Cannot add magazine '{name}'.")
+            return
+        publisher_id = row[0]
+    
         cursor.execute("INSERT INTO magazines (name, publisher_id) VALUES (?, ?)", (name, publisher_id))
     except sqlite3.IntegrityError:
         print(f"Magazine '{name}' already exists.")
+    except sqlite3.Error as e:
+        print(f"Database error while adding magazine '{name}': {e}")
 
 
 # Function to add a subscriber
 def add_subscriber(cursor, name, address):
-    # check that you don't already have an entry where both the name and the address are the same
-    cursor.execute("SELECT subscriber_id FROM subscribers WHERE name = ? AND address = ?", (name, address))
-    if cursor.fetchone():
+    try:
+        # check that you don't already have an entry where both the name and the address are the same
+        cursor.execute("SELECT subscriber_id FROM subscribers WHERE name = ? AND address = ?", (name, address))
+        if cursor.fetchone():
+            print(f"Subscriber '{name}' at '{address}' already exists.")
+            return
+        
+        cursor.execute("INSERT INTO subscribers (name, address) VALUES (?, ?)", (name, address))
+    except sqlite3.IntegrityError:
         print(f"Subscriber '{name}' at '{address}' already exists.")
-        return
-    
-    cursor.execute("INSERT INTO subscribers (name, address) VALUES (?, ?)", (name, address))
+    except sqlite3.Error as e:
+            print(f"Database error while adding subscriber '{name}': {e}")
+
 
 # Function to add a subscription
 def add_subscription(cursor, subscriber_name, subscriber_address, magazine_name, expiration_date):
-    # 1. Find subscriber_id
-    cursor.execute("SELECT subscriber_id FROM subscribers WHERE name = ? AND address = ?", (subscriber_name, subscriber_address))
-    row_subscriber = cursor.fetchone()
-    if not row_subscriber:
-        print(f"Subscriber '{subscriber_name}' not found.")
-        return
-    subscriber_id = row_subscriber[0]
+    try:
+        # 1. Find subscriber_id
+        cursor.execute("SELECT subscriber_id FROM subscribers WHERE name = ? AND address = ?", (subscriber_name, subscriber_address))
+        row_subscriber = cursor.fetchone()
+        if not row_subscriber:
+            print(f"Subscriber '{subscriber_name}' not found.")
+            return
+        subscriber_id = row_subscriber[0]
 
-    # 2. Find magazine_id
-    cursor.execute("SELECT magazine_id FROM magazines WHERE name = ?", (magazine_name,))
-    row_magazine = cursor.fetchone()
-    if not row_magazine:
-        print(f"Magazine '{magazine_name}' not found.")
-        return
-    magazine_id = row_magazine[0]
+        # 2. Find magazine_id
+        cursor.execute("SELECT magazine_id FROM magazines WHERE name = ?", (magazine_name,))
+        row_magazine = cursor.fetchone()
+        if not row_magazine:
+            print(f"Magazine '{magazine_name}' not found.")
+            return
+        magazine_id = row_magazine[0]
 
-    # 3. Check for existing subscription
-    cursor.execute("""
-        SELECT subscription_id FROM subscriptions 
-        WHERE subscriber_id = ? AND magazine_id = ?
-    """, (subscriber_id, magazine_id))
-    if cursor.fetchone():
+        # 3. Check for existing subscription
+        cursor.execute("""
+            SELECT subscription_id FROM subscriptions 
+            WHERE subscriber_id = ? AND magazine_id = ?
+        """, (subscriber_id, magazine_id))
+        if cursor.fetchone():
+            print(f"Subscription for '{subscriber_name}' to '{magazine_name}' already exists.")
+            return
+
+        cursor.execute("""
+            INSERT INTO subscriptions (subscriber_id, magazine_id, expiration_date) 
+            VALUES (?, ?, ?)
+        """, (subscriber_id, magazine_id, expiration_date))
+
+    except sqlite3.IntegrityError:
         print(f"Subscription for '{subscriber_name}' to '{magazine_name}' already exists.")
-        return
-
-    cursor.execute("""
-        INSERT INTO subscriptions (subscriber_id, magazine_id, expiration_date) 
-        VALUES (?, ?, ?)
-    """, (subscriber_id, magazine_id, expiration_date))
+    except sqlite3.Error as e:
+        print(f"Database error while adding subscription: {e}")
 
 # ------------------------------------------------------------------------------------
 
@@ -79,7 +94,7 @@ try:
     with  sqlite3.connect("../db/magazines.db") as conn:  
         print("Database created and connected successfully.")
 
-        #conn.execute("PRAGMA foreign_keys = 1")
+        conn.execute("PRAGMA foreign_keys = 1")
         cursor = conn.cursor()
 
 
@@ -109,7 +124,8 @@ try:
         CREATE TABLE IF NOT EXISTS subscribers (
             subscriber_id INTEGER PRIMARY KEY,
             name TEXT NOT NULL,
-            address TEXT NOT NULL
+            address TEXT NOT NULL,
+            UNIQUE (name, address)
         )
         """)
 
